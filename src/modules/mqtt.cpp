@@ -22,6 +22,7 @@ namespace MQTT {
         Serial.print(topic);
         Serial.print(": ");
 
+        content = ""; 
         for (size_t i = 0; i < length; i++) {
             content.concat((char)payload[i]);
         }
