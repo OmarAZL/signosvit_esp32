@@ -11,9 +11,23 @@ namespace MQTT {
     const char* passwd = env::passwd;
 
     const char* server = "192.168.1.112";
-    const uint16_t port = 8883;
-    const char* mqttUser = "";
-    const char* mqttPassword = "";
+    const uint16_t port = 1883;
+    const char* mqttUser = "omar";
+    const char* mqttPassword = "omar";
+    String macAddress = WiFi.macAddress(); 
+
+    String content = ""; 
+    void OnMqttReceived(char* topic, byte* payload, unsigned int length) {
+        Serial.print("Recibido en ");
+        Serial.print(topic);
+        Serial.print(": ");
+
+        for (size_t i = 0; i < length; i++) {
+            content.concat((char)payload[i]);
+        }
+        Serial.print(content);
+        Serial.println();
+    }
 
     void initWifi() {
         WiFi.begin(ssid, passwd);
@@ -26,20 +40,24 @@ namespace MQTT {
 
     void init() {
         initWifi();
-        String mac = WiFi.macAddress();
         mqttClient.setServer(server, port);
+        mqttClient.setCallback(OnMqttReceived);
         while (!mqttClient.connected())
         {
-            Serial.println("Connecting to MQTT...");
-            if (mqttClient.connect(mac.c_str())) {
-                Serial.println("connected");
+            Serial.println("Conectando a MQTT...");
+            if (mqttClient.connect(macAddress.c_str(), mqttUser, mqttPassword)) {
+                String topic = "esp32/" + macAddress;
+                mqttClient.subscribe(topic.c_str());
+                Serial.println("Conectado a MQTT");
+                Serial.println("Suscrito al tópico: " + topic);
             }
             else
             {   
-                Serial.print("failed with state ");
+                Serial.print("Fallo con el estado: ");
                 Serial.println(mqttClient.state());
                 delay(2000);
             }
         }
     }   
+
 }

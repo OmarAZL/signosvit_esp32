@@ -11,9 +11,12 @@ String payload;
 void loop() {
     mqttClient.loop();
 
-    payload = "";
-    payload = String(millis());
-    Serial.println(payload);
-    mqttClient.publish("hello/world", (char*)payload.c_str(), true);
+    if(mqttClient.connected()) {
+        payload = "";
+        payload = String(millis());
+        Serial.println(payload);
+        mqttClient.publish("hello/world", (char*)payload.c_str(), true);
+    }
+    
     delay(600);
 }
