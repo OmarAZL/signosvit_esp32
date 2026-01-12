@@ -1,22 +1,22 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
+#include "modules/mqtt.h"W
 #include "env.h"
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
-namespace MQTT {
+// [Variables]
+const char* ssid = env::ssid;
+const char* passwd = env::passwd;
 
-    const char* ssid = env::ssid;
-    const char* passwd = env::passwd;
+const char* server = "192.168.1.112";
+const uint16_t port = 1883;
+const char* mqttUser = "omar";
+const char* mqttPassword = "omar";
+String macAddress = WiFi.macAddress();
 
-    const char* server = "192.168.1.112";
-    const uint16_t port = 1883;
-    const char* mqttUser = "omar";
-    const char* mqttPassword = "omar";
-    String macAddress = WiFi.macAddress(); 
+namespace MQTT { 
 
-    String content = ""; 
+    String content = ""; // Esta función se puede llamar varias veces, asi que para evitar crear una variable en cada llamada, se crea desde un inicio.
     void OnMqttReceived(char* topic, byte* payload, unsigned int length) {
         Serial.print("Recibido en ");
         Serial.print(topic);

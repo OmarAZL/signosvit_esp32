@@ -2,6 +2,7 @@
 #include "modules/mqtt.h"
 #include "modules/display.h"
 
+// Aun no le encuentro un lugar a esta funcion, es para verificar que un dispositivo i2c este conectado
 bool isConnected(uint8_t address) {
     Wire.beginTransmission(address);
     return (Wire.endTransmission() == 0);
