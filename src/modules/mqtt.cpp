@@ -1,8 +1,9 @@
-#include "modules/mqtt.h"W
+#include "modules/mqtt.h"
 #include "env.h"
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
+JsonDocument jsonDoc;
 
 // [Variables]
 const char* ssid = env::ssid;
@@ -60,5 +61,17 @@ namespace MQTT {
             }
         }
     }   
+
+    void sendData(float temp1, float temp2, unsigned long timestamp) {
+        jsonDoc.clear();
+        jsonDoc["mac"] = macAddress;
+        jsonDoc["timestamp"] = timestamp;
+        jsonDoc["data"]["temp1"] = temp1;
+        jsonDoc["data"]["temp2"] = temp2;
+        char buffer[256];
+        size_t n = serializeJson(jsonDoc, buffer);
+        String topic = "devices";
+        mqttClient.publish(topic.c_str(), buffer, n);
+    }
 
 }
