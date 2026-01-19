@@ -52,7 +52,7 @@ namespace Display {
         display.print(String(temp1, 2) + "C");
 
         display.setCursor(32, 33);
-        display.print(String(temp1, 2) + "C");
+        display.print(String(temp2, 2) + "C");
 
         unsigned long now = timestamp / 1000;
         unsigned long seconds = now % 60;
