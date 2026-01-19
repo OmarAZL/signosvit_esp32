@@ -6,6 +6,7 @@
 extern PubSubClient mqttClient;
 
 namespace MQTT {
+    bool connectMQTT();
     void init();
     void sendData(float temp1, float temp2, unsigned long timestamp);
 }

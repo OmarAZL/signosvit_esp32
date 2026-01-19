@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "modules/mqtt.h"
 #include "modules/display.h"
+#include "modules/utils.h"
 
 #include "sensors/ds18b20.h"
 #include "sensors/gy906.h"
@@ -25,13 +26,15 @@ bool isConnected(uint8_t address) {
 
 void setup() {
     Serial.begin(115200);
-    MQTT::init();
     Display::init();
+    MQTT::init();
     DS18B20::init();
     GY906::init();
+    Utils::init();
 
-    Display::showMessage("Pantalla iniciada");
+    Display::showMessage("Iniciando...");
     delay(1000);
+    Display::clear();
     
     Serial.println("\nEnviando mensajes.");
 }
@@ -41,28 +44,25 @@ float temp1;
 float temp2;
 
 unsigned long now = 0;
+unsigned long lastReport = 0;
 
 void loop() {
-    mqttClient.loop();
     now = millis();
 
-    temp1 = DS18B20::getTemperature();
-    temp2 = GY906::getTempObject();
+    if ((millis() - lastReport) > 1500) {
+        mqttClient.loop();
+        lastReport = now;
 
-    if(mqttClient.connected()) {   
-        MQTT::sendData(temp1, temp2, now);
+        temp1 = DS18B20::getTemperature();
+        temp2 = GY906::getTempObject();
+        bool mqttConnected = mqttClient.connected();
+        if(mqttConnected) {   
+            MQTT::sendData(temp1, temp2, now);
+        }
+        else if(WiFi.isConnected()) {
+            MQTT::connectMQTT();
+        }
+        
+        Display::showData(temp1, temp2, now, mqttConnected);
     }
-    
-    Display::clear();
-    display.setTextSize(1); // Normal size
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 0);
-    display.println("Temperatura 1: " + String(temp1, 2));
-    display.println("Temperatura 2: " + String(temp2, 2));
-    display.println("Timestamp: " + String(now));
-    String mqttStatus = mqttClient.connected() ? "Activado" : "Desactivado";
-    display.println("MQTT: " + mqttStatus);
-    Display::updateDisplay();
-    
-    delay(1600);
 }

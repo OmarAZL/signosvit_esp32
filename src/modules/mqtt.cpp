@@ -9,7 +9,7 @@ JsonDocument jsonDoc;
 const char* ssid = env::ssid;
 const char* passwd = env::passwd;
 
-const char* server = "192.168.1.112";
+const char* server = "192.168.1.103";
 const uint16_t port = 1883;
 const char* mqttUser = "omar";
 const char* mqttPassword = "omar";
@@ -33,33 +33,37 @@ namespace MQTT {
 
     void initWifi() {
         WiFi.begin(ssid, passwd);
-        while (WiFi.status() != WL_CONNECTED) {
+        while (!WiFi.isConnected()) {
             delay(1000);
             Serial.println("Conectando al WiFi");
         }
         Serial.println("Conectado al WiFi");
     }
 
+    bool connectMQTT() {
+        if(mqttClient.connected()) {
+            return true;
+        }
+
+        if (mqttClient.connect(macAddress.c_str(), mqttUser, mqttPassword)) {
+            String topic = "esp32/" + macAddress;
+            mqttClient.subscribe(topic.c_str());
+            Serial.println("Conectado a MQTT");
+            Serial.println("Suscrito al tópico: " + topic);
+            return true;
+        }
+         
+        Serial.print("Fallo con el estado: ");
+        Serial.println(mqttClient.state());
+        return false;
+    }
+
     void init() {
         initWifi();
         mqttClient.setServer(server, port);
         mqttClient.setCallback(OnMqttReceived);
-        while (!mqttClient.connected())
-        {
-            Serial.println("Conectando a MQTT...");
-            if (mqttClient.connect(macAddress.c_str(), mqttUser, mqttPassword)) {
-                String topic = "esp32/" + macAddress;
-                mqttClient.subscribe(topic.c_str());
-                Serial.println("Conectado a MQTT");
-                Serial.println("Suscrito al tópico: " + topic);
-            }
-            else
-            {   
-                Serial.print("Fallo con el estado: ");
-                Serial.println(mqttClient.state());
-                delay(2000);
-            }
-        }
+        Serial.println("Conectando a MQTT...");
+        connectMQTT();
     }   
 
     void sendData(float temp1, float temp2, unsigned long timestamp) {

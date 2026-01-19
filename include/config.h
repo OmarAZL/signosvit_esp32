@@ -11,4 +11,4 @@
 
 #define GY906_ADDRESS 0x5A
 
-#define BUTTON_PIN 26 // Botón [59]
+#define BUTTON_PIN GPIO_NUM_26

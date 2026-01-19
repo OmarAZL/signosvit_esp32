@@ -10,4 +10,5 @@ namespace Display {
     void clear();
     void updateDisplay();
     void showMessage(const String& message);
+    void showData(float &temp1, float &temp2, unsigned long &timestamp, bool &isActiveMQTT);
 }
