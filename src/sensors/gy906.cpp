@@ -10,10 +10,11 @@ namespace GY906 {
     }
 
     float getTemperature(uint8_t reg) {
+        Wire.setClock(100000UL); // 100 kHz estándar
         Wire.beginTransmission(GY906_ADDRESS);
         Wire.write(reg);
         Wire.endTransmission(false);
-        Wire.requestFrom(GY906_ADDRESS, (uint8_t)3);
+        Wire.requestFrom(GY906_ADDRESS, 3);
         if (Wire.available() >= 3) {
             uint16_t temp = Wire.read();
             temp |= Wire.read() << 8;

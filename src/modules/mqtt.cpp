@@ -9,7 +9,7 @@ JsonDocument jsonDoc;
 const char* ssid = env::ssid;
 const char* passwd = env::passwd;
 
-const char* server = "192.168.1.103";
+const char* server = "192.168.1.108";
 const uint16_t port = 1883;
 const char* mqttUser = "omar";
 const char* mqttPassword = "omar";
@@ -66,12 +66,15 @@ namespace MQTT {
         connectMQTT();
     }   
 
-    void sendData(float temp1, float temp2, unsigned long timestamp) {
+    void sendData(float &temp1, float &temp2, int &spo2, int &bpm, int &ecg, bool &electrodes) {
         jsonDoc.clear();
         jsonDoc["mac"] = macAddress;
-        jsonDoc["timestamp"] = timestamp;
+        jsonDoc["timestamp"] = millis();
         jsonDoc["data"]["temp1"] = temp1;
         jsonDoc["data"]["temp2"] = temp2;
+        jsonDoc["data"]["ecg"] = electrodes ? ecg : -127;
+        jsonDoc["data"]["bpm"] = bpm;
+        jsonDoc["data"]["spo2"] = spo2;
         char buffer[256];
         size_t n = serializeJson(jsonDoc, buffer);
         String topic = "devices";

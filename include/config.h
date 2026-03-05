@@ -11,4 +11,12 @@
 
 #define GY906_ADDRESS 0x5A
 
-#define BUTTON_PIN GPIO_NUM_26
+#define BUZZER_PIN 25
+
+// constantes útiles para el bus I2C
+#ifndef I2C_SPEED_STANDARD
+#define I2C_SPEED_STANDARD 100000UL  // 100 kHz
+#endif
+#ifndef I2C_SPEED_FAST
+#define I2C_SPEED_FAST     400000UL  // 400 kHz (el MAX30105 puede usarla)
+#endif
