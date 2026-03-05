@@ -32,12 +32,12 @@ namespace DS18B20 {
             sensors.requestTemperatures();
             float temperature = sensors.getTempCByIndex(0);
             if (temperature == DEVICE_DISCONNECTED_C) {
-                return NAN;
+                return -127;
             }
             return temperature;
         }
         
-        return NAN;
+        return -127;
         
     }
 

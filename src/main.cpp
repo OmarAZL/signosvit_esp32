@@ -8,6 +8,8 @@
 #include "sensors/gy906.h"
 #include "sensors/max_sensor.h"
 
+const bool enabledBuzzer = true;
+
 // Aun no le encuentro un lugar a esta funcion, es para verificar que un dispositivo i2c este conectado
 bool isConnected(uint8_t address) {
     Wire.beginTransmission(address);
@@ -55,6 +57,27 @@ unsigned long updateMaxSensorsMS = 0;
 unsigned long showSensorsMS = 0;
 unsigned long reconnectMqttMS = 0;
 
+bool maxSensorBuzzer = false;
+bool tempSensorBuzzer = false;
+
+/*
+1. BPM (Frecuencia Cardíaca)
+Malo por bajo (< 50 lpm): Si la persona no es un atleta de alto rendimiento y tiene pulso bajo, puede haber mareos o desmayos.
+
+Malo por alto (> 120 lpm): Si está en reposo y su corazón late así, puede indicar deshidratación, estrés extremo, infección o problemas cardíacos.
+
+2. SpO2 (Saturación de Oxígeno)
+92% a 94%: Se considera "preocupante" o nivel bajo (necesita monitoreo).
+
+Menos de 90%: Es una emergencia médica. El cuerpo no está oxigenando los órganos vitales correctamente.
+
+3. Temperatura
+Fiebre (> 38°C): Indica que el cuerpo está luchando contra una infección.
+
+Hipotermia (< 35°C): Es peligrosa porque los órganos empiezan a fallar por falta de calor.
+*/
+
+
 void loop() {
     Utils::updateBuzzer();
 
@@ -63,20 +86,38 @@ void loop() {
         if (MaxSensor::isDataValid()) {
             bpm = MaxSensor::getBPM();
             spo2 = MaxSensor::getSpO2();
+            
+            if(enabledBuzzer) {
+                if((bpm < 50 || (bpm > 120 && bpm < 1000) || spo2 < 90 ) && !tempSensorBuzzer) {
+                    Utils::startTone(1000, 400, true);
+                    maxSensorBuzzer = true;
+                } else if(maxSensorBuzzer) {
+                    Utils::stopTone();
+                    maxSensorBuzzer = false;
+                }
+            }
         }
     }
 
     if (isTimerExpired(updateSensorsMS, 200)) {
-        //temp1 = NAN;
-        //temp1 = DS18B20::getTemperature();
+        temp1 = DS18B20::getTemperature();
         temp2 = GY906::getTempObject();
+
+        if(enabledBuzzer) {
+            if((temp1 > 38 || temp2 > 38) && !maxSensorBuzzer) {
+            Utils::startTone(1000, 400, true);
+                tempSensorBuzzer = true;
+            } else if(tempSensorBuzzer) {
+                Utils::stopTone();
+                tempSensorBuzzer = false;
+            }
+        }        
 
         electrodes = AD8232::electrodesConnected();
         ecg = AD8232::readECG();
     }
 
     if (isTimerExpired(showSensorsMS, 800)) {
-        //Nextion::write(temp1, temp2, spo2, bpm, ecg, electrodes);
         bool mqttConnected = mqttClient.connected();
         
         if(mqttConnected) {

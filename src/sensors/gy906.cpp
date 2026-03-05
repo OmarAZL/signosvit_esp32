@@ -21,7 +21,7 @@ namespace GY906 {
             Wire.read();
             return (temp * 0.02) - 273.15;
         }
-        return NAN;
+        return -127;
     }
 
     float getTempObject() {
