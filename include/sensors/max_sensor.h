@@ -15,4 +15,5 @@ namespace MaxSensor {
     int32_t getSpO2();
     bool isDataValid();
     bool hasNewData();
+    bool isReadingData();
 }

@@ -9,7 +9,7 @@ JsonDocument jsonDoc;
 const char* ssid = env::ssid;
 const char* passwd = env::passwd;
 
-const char* server = "192.168.1.108";
+const char* server = "10.53.30.57";
 const uint16_t port = 1883;
 const char* mqttUser = "omar";
 const char* mqttPassword = "omar";

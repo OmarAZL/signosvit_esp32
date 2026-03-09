@@ -25,7 +25,6 @@ namespace DS18B20 {
     }
 
     float getTemperature() {
-        Serial.println(connected);
         if(connected) {
             // Solicita una conversión de forma no bloqueante y devuelve
             // la última temperatura convertida (si no hay nueva, devuelve la anterior).

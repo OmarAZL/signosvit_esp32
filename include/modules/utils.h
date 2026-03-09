@@ -7,4 +7,7 @@ namespace Utils {
     void startTone(int frequency, int duration, bool loopMode = false);
     void stopTone();
     void updateBuzzer();
+
+    // reproducir un "beep" rápido independiente de otros tonos
+    void pulseTone(int frequency, int duration);
 }

@@ -70,4 +70,13 @@ namespace Utils {
         }
     }
 
+    // --- función nueva: reproduce un tono puntual sin alterar el estado
+    // del buzzer que usa las funciones startTone/stopTone. Esto es útil
+    // para emitir beeps de latido cardiaco mientras una alarma ya esté sonando.
+    void pulseTone(int frequency, int duration) {
+        // tone(pin, freq, duration) maneja el apagado automáticamente;
+        // no tocamos ninguna variable global para no interferir.
+        tone(BUZZER_PIN, frequency, duration);
+    }
+
 }
